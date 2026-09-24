@@ -165,3 +165,23 @@ textarea.input { min-height:110px; resize:vertical; }
   .poll-header { flex-direction:column; }
   .qr-card { flex-direction:column; align-items:flex-start; }
 }
+
+.feature-action { position:relative; min-height:205px; display:flex; flex-direction:column; }
+.feature-link { margin-top:auto; padding-top:18px; color:#c8bcff; text-decoration:none; font-weight:700; font-size:.86rem; }
+.feature-link span { display:inline-block; transition:.2s; }
+.feature-action:hover .feature-link span { transform:translateX(5px); }
+
+.chart-card { margin:20px 0; padding:22px; border:1px solid var(--line); border-radius:20px; background:linear-gradient(180deg,rgba(255,255,255,.035),rgba(255,255,255,.015)); }
+.chart-head { margin-bottom:18px; }
+.chart-head h3 { margin:4px 0 0; }
+.chart-head > strong { font-family:'Space Grotesk'; font-size:1.3rem; }
+.chart-bars { height:280px; display:flex; align-items:stretch; gap:clamp(10px,2vw,22px); padding:18px 4px 0; border-bottom:1px solid var(--line); overflow-x:auto; }
+.chart-item { min-width:74px; flex:1; max-width:150px; display:flex; flex-direction:column; justify-content:flex-end; text-align:center; }
+.chart-value { font-size:.78rem; color:#dfe3ef; min-height:18px; }
+.chart-column-wrap { height:190px; display:flex; align-items:flex-end; justify-content:center; }
+.chart-column { width:min(58px,70%); min-height:10px; border-radius:10px 10px 4px 4px; background:linear-gradient(180deg,#a78bfa,#7c5cff 58%,#21d4a3); box-shadow:0 12px 28px rgba(124,92,255,.2); position:relative; transition:height .5s cubic-bezier(.2,.8,.2,1); }
+.chart-column span { position:absolute; top:8px; left:50%; transform:translateX(-50%); font-size:.7rem; font-weight:700; color:white; }
+.chart-name { margin-top:9px; font-size:.76rem; color:#b9c0d0; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+.chart-axis { display:flex; justify-content:space-between; color:#6f7b91; font-size:.7rem; padding-top:9px; }
+
+.brand-mark { font-family:'Space Grotesk',sans-serif; font-size:1.65rem; font-weight:700; line-height:1; transform:scaleX(1.15); }
