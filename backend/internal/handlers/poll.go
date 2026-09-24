@@ -3,7 +3,6 @@ package handlers
 import (
 	"context"
 	"crypto/rand"
-	"fmt"
 	"log"
 	"encoding/hex"
 	"errors"
