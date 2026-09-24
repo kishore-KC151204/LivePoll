@@ -32,7 +32,7 @@ func main() {
 	hub := ws.NewHub(redisStore)
 	hub.SubscribeAll(context.Background())
 
-	authHandler := &handlers.AuthHandler{Store: mongoStore, JWTSecret: cfg.JWTSecret}
+	authHandler := &handlers.AuthHandler{Store: mongoStore, JWTSecret: cfg.JWTSecret, FrontendURL: cfg.FrontendURL, ResendAPIKey: cfg.ResendAPIKey, EmailFrom: cfg.EmailFrom}
 	pollHandler := &handlers.PollHandler{Store: mongoStore, Redis: redisStore}
 	socketHandler := &handlers.SocketHandler{Hub: hub, FrontendURL: cfg.FrontendURL}
 
@@ -50,6 +50,8 @@ func main() {
 		auth.POST("/signup", authHandler.Signup)
 		auth.POST("/login", authHandler.Login)
 		auth.POST("/logout", authHandler.Logout)
+    auth.POST("/forgot-password", authHandler.ForgotPassword)
+    auth.POST("/reset-password", authHandler.ResetPassword)
 
 		polls := api.Group("/polls")
 		polls.POST("", middleware.RequireAuth(cfg.JWTSecret), pollHandler.CreatePoll)
