@@ -4,6 +4,7 @@ import { QRCodeCanvas } from 'qrcode.react'
 import { api } from '../services/api'
 import { connectPollSocket } from '../services/ws'
 import ResultsBars from '../components/ResultsBars'
+import VoteChart from '../components/VoteChart'
 
 export default function PollResults() {
   const { id } = useParams()
@@ -89,7 +90,10 @@ export default function PollResults() {
         </div>
 
         <div className="divider"/>
-        {results && <ResultsBars options={results.options} total={results.total} />}
+        {results && <>
+          <VoteChart options={results.options} total={results.total} />
+          <ResultsBars options={results.options} total={results.total} />
+        </>}
 
         <div className="actions" style={{justifyContent:'flex-start'}}>
           <Link className="btn primary" to={`/poll/${id}`}>Open voter view ↗</Link>
