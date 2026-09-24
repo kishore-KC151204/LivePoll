@@ -34,6 +34,8 @@ export const api = {
   getResults: (id) => request(`/polls/${id}/results`),
   vote: (id, payload) => request(`/polls/${id}/vote`, { method: 'POST', body: payload }),
   closePoll: (id) => request(`/polls/${id}/close`, { method: 'POST', auth: true }),
+  updatePoll: (id, payload) => request(`/polls/${id}`, { method: 'PATCH', body: payload, auth: true }),
+  deletePoll: (id) => request(`/polls/${id}`, { method: 'DELETE', auth: true }),
 }
 
 export { BASE_URL }
