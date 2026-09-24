@@ -7,6 +7,7 @@ import Dashboard from './pages/Dashboard'
 import CreatePoll from './pages/CreatePoll'
 import PollVote from './pages/PollVote'
 import PollResults from './pages/PollResults'
+import EditPoll from './pages/EditPoll'
 import ForgotPassword from './pages/ForgotPassword'
 import ResetPassword from './pages/ResetPassword'
 import { useAuth } from './context/AuthContext'
@@ -61,6 +62,7 @@ export default function App() {
         <Route path="/create" element={<CreatePoll />} />
         <Route path="/poll/:id" element={<PollVote />} />
         <Route path="/results/:id" element={<PollResults />} />
+        <Route path="/edit/:id" element={<EditPoll />} />
       </Routes>
     </>
   )
