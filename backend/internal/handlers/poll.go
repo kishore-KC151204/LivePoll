@@ -3,6 +3,8 @@ package handlers
 import (
 	"context"
 	"crypto/rand"
+	"fmt"
+	"log"
 	"encoding/hex"
 	"errors"
 	"net/http"
@@ -68,7 +70,9 @@ func (h *PollHandler) CreatePoll(c *gin.Context) {
 		return
 	}
 
+	pollID := primitive.NewObjectID()
 	poll := models.Poll{
+		ID:        pollID,
 		Question:  strings.TrimSpace(req.Question),
 		Options:   options,
 		OwnerID:   ownerID,
@@ -76,12 +80,19 @@ func (h *PollHandler) CreatePoll(c *gin.Context) {
 		CreatedAt: time.Now().UTC(),
 	}
 
-	res, err := h.Store.Polls.InsertOne(context.Background(), poll)
+	ctx, cancel := context.WithTimeout(context.Background(), 8*time.Second)
+	defer cancel()
+
+	_, err = h.Store.Polls.InsertOne(ctx, poll)
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "failed to create poll"})
+		log.Printf("CreatePoll insert failed owner=%s poll=%s: %v", ownerID.Hex(), pollID.Hex(), err)
+		if mongo.IsDuplicateKeyError(err) {
+			c.JSON(http.StatusConflict, gin.H{"error": "this poll conflicts with an existing database rule. Try changing the question."})
+			return
+		}
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "failed to create poll. The database rejected the poll; please try again."})
 		return
 	}
-	poll.ID = res.InsertedID.(primitive.ObjectID)
 
 	c.JSON(http.StatusCreated, poll)
 }
