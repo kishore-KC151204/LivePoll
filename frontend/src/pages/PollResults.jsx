@@ -79,7 +79,7 @@ export default function PollResults() {
         </div>
 
         <div className="qr-card">
-          <QRCodeCanvas id="poll-qr" value={shareUrl} size={150} includeMargin />
+          <QRCodeCanvas id="poll-qr" value={shareUrl} size={150} marginSize={4} />
           <div className="stack">
             <span className="eyebrow">Scan to vote</span>
             <h3>Put this QR on a screen, slide or poster.</h3>
