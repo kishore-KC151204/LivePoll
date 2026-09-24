@@ -20,7 +20,7 @@ function Nav() {
     <header className="nav">
       <div className="nav-inner">
         <Link className="brand" to="/">
-          <span className="brand-mark">✦</span>
+          <span className="brand-mark" aria-label="LivePoll">∞</span>
           LivePoll
         </Link>
         <div className="nav-actions">
