@@ -18,6 +18,12 @@ export default function Dashboard(){
     const url=`${window.location.origin}/poll/${id}`
     await navigator.clipboard.writeText(url);setCopied(id);setTimeout(()=>setCopied(''),1600)
   }
+  async function deletePoll(id){
+    const poll=polls.find(p=>p.id===id)
+    if(!poll||!window.confirm(`Delete “${poll.question}”? This cannot be undone.`))return
+    try{await api.deletePoll(id);setPolls(items=>items.filter(p=>p.id!==id))}
+    catch(e){setError(e.message)}
+  }
   async function share(id){
     const url=`${window.location.origin}/poll/${id}`
     if(navigator.share) await navigator.share({title:'LivePoll',text:'Vote on this live poll',url})
@@ -56,6 +62,8 @@ export default function Dashboard(){
             <p className="muted small">{poll.options.length} choices · {new Date(poll.createdAt).toLocaleDateString()}</p>
             <div className="actions" style={{justifyContent:'flex-start'}}>
               <Link className="btn small primary" to={`/results/${poll.id}`}>Analytics</Link>
+              {poll.status==='ACTIVE'&&<Link className="btn small" to={`/edit/${poll.id}`}>Edit</Link>}
+              <button className="btn small danger" onClick={()=>deletePoll(poll.id)}>Delete</button>
               <Link className="btn small" to={`/poll/${poll.id}`}>Open</Link>
               <button className="btn small" onClick={()=>copyLink(poll.id)}>{copied===poll.id?'Copied ✓':'Copy link'}</button>
               <button className="btn small" onClick={()=>share(poll.id)}>Share</button>
