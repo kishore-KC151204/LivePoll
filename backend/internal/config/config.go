@@ -12,6 +12,8 @@ type Config struct {
 	RedisURL     string
 	JWTSecret    string
 	FrontendURL  string
+  ResendAPIKey string
+  EmailFrom string
 }
 
 func getenv(key, fallback string) string {
@@ -30,5 +32,7 @@ func Load() Config {
 		RedisURL:    getenv("REDIS_URL", "redis://localhost:6379"),
 		JWTSecret:   getenv("JWT_SECRET", ""),
 		FrontendURL: getenv("FRONTEND_URL", "http://localhost:5173"),
+    ResendAPIKey: getenv("RESEND_API_KEY", ""),
+    EmailFrom: getenv("EMAIL_FROM", ""),
 	}
 }
