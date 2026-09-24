@@ -10,10 +10,13 @@ import PollResults from './pages/PollResults'
 import ForgotPassword from './pages/ForgotPassword'
 import ResetPassword from './pages/ResetPassword'
 import { useAuth } from './context/AuthContext'
+import { useState } from 'react'
+import AppearancePanel from './components/AppearancePanel'
 
 function Nav() {
   const { user, logout } = useAuth()
   const location = useLocation()
+  const [appearance,setAppearance]=useState(false)
   if (location.pathname.startsWith('/poll/')) return null
 
   return (
@@ -28,6 +31,7 @@ function Nav() {
             <>
               <Link className="btn small hide-mobile" to="/dashboard">Dashboard</Link>
               <Link className="btn small primary" to="/create">Create poll</Link>
+              <button className="btn small" onClick={()=>setAppearance(true)}>◐ Appearance</button>
               <button className="btn small" onClick={logout}>Log out</button>
             </>
           ) : (
@@ -38,6 +42,7 @@ function Nav() {
           )}
         </div>
       </div>
+      <AppearancePanel open={appearance} onClose={()=>setAppearance(false)} />
     </header>
   )
 }
