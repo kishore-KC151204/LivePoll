@@ -30,6 +30,10 @@ export default function Login() {
         {error && <div className="error">{error}</div>}
         <input placeholder="Email" type="email" required
           value={form.email} onChange={(e) => setForm({ ...form, email: e.target.value })} />
+        <div className="row between">
+          <label className="field-label">Password</label>
+          <Link className="muted small" to="/forgot-password">Forgot password?</Link>
+        </div>
         <input placeholder="Password" type="password" required
           value={form.password} onChange={(e) => setForm({ ...form, password: e.target.value })} />
         <button className="btn primary" disabled={loading} type="submit">
