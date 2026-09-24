@@ -14,6 +14,7 @@ export default function CreatePoll(){
 
   function applyPreset(p){setQuestion(p.question);setOptions(p.options)}
   function updateOption(i,value){setOptions(o=>o.map((x,idx)=>idx===i?value:x))}
+  function reset(){setQuestion('');setOptions(['','']);setError('')}
   function addOption(){if(options.length<10)setOptions([...options,''])}
   function removeOption(i){if(options.length>2)setOptions(options.filter((_,idx)=>idx!==i))}
   async function submit(e){
@@ -50,6 +51,7 @@ export default function CreatePoll(){
         {options.length<10&&<button type="button" className="btn" onClick={addOption}>＋ Add choice</button>}
         <div className="divider"/>
         <div className="row between">
+          <button type="button" className="btn" onClick={reset}>Clear</button>
           <Link className="btn" to="/dashboard">Cancel</Link>
           <button className="btn primary" disabled={loading}>{loading?'Creating live room…':'Create & open analytics →'}</button>
         </div>
