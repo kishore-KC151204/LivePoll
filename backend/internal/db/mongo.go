@@ -4,6 +4,7 @@ import (
 	"context"
 	"time"
 
+	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
 )
@@ -48,7 +49,7 @@ func NewMongoStore(uri, dbName string) (*MongoStore, error) {
 
 func (s *MongoStore) ensureIndexes(ctx context.Context) error {
 	_, err := s.Users.Indexes().CreateOne(ctx, mongo.IndexModel{
-		Keys:    map[string]int{"email": 1},
+		Keys:    bson.D{{Key: "email", Value: 1}},
 		Options: options.Index().SetUnique(true),
 	})
 	if err != nil {
@@ -57,7 +58,7 @@ func (s *MongoStore) ensureIndexes(ctx context.Context) error {
 	// One vote per (pollId, voterId) — this is the durable half of duplicate
 	// vote protection; Redis SETs give the fast pre-check.
 	_, err = s.Votes.Indexes().CreateOne(ctx, mongo.IndexModel{
-		Keys:    map[string]int{"pollId": 1, "voterId": 1},
+		Keys:    bson.D{{Key: "pollId", Value: 1}, {Key: "voterId", Value: 1}},
 		Options: options.Index().SetUnique(true),
 	})
 	return err
