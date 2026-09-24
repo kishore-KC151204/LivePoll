@@ -31,6 +31,11 @@ type createPollRequest struct {
 	Options  []string `json:"options" binding:"required,min=2,max=10"`
 }
 
+type updatePollRequest struct {
+	Question string   `json:"question" binding:"required,min=3,max=300"`
+	Options  []string `json:"options" binding:"required,min=2,max=10"`
+}
+
 func randomOptionID() string {
 	b := make([]byte, 6)
 	_, _ = rand.Read(b)
@@ -130,6 +135,73 @@ func (h *PollHandler) GetPoll(c *gin.Context) {
 		return
 	}
 	c.JSON(http.StatusOK, poll)
+}
+
+// UpdatePoll — protected + ownership-checked. Question and options can be edited
+// before voting. Once votes exist, the option structure is locked so historical
+// vote records can never become ambiguous.
+func (h *PollHandler) UpdatePoll(c *gin.Context) {
+	pollID, err := primitive.ObjectIDFromHex(c.Param("id"))
+	if err != nil { c.JSON(http.StatusBadRequest, gin.H{"error":"invalid poll id"}); return }
+	ownerID, err := primitive.ObjectIDFromHex(c.GetString(middleware.UserIDKey))
+	if err != nil { c.JSON(http.StatusUnauthorized, gin.H{"error":"invalid user"}); return }
+
+	var req updatePollRequest
+	if err := c.ShouldBindJSON(&req); err != nil { c.JSON(http.StatusBadRequest, gin.H{"error":err.Error()}); return }
+
+	var poll models.Poll
+	if err := h.Store.Polls.FindOne(context.Background(), bson.M{"_id":pollID,"ownerId":ownerID}).Decode(&poll); err != nil {
+		if errors.Is(err,mongo.ErrNoDocuments) { c.JSON(http.StatusNotFound,gin.H{"error":"poll not found"}); return }
+		c.JSON(http.StatusInternalServerError,gin.H{"error":"failed to load poll"}); return
+	}
+	if poll.Status != models.PollActive { c.JSON(http.StatusConflict,gin.H{"error":"closed polls cannot be edited"}); return }
+
+	seen:=map[string]bool{}
+	options:=make([]models.PollOption,0,len(req.Options))
+	for _, raw:=range req.Options {
+		text:=strings.TrimSpace(raw)
+		if text=="" || len(text)>200 { c.JSON(http.StatusBadRequest,gin.H{"error":"each option must be 1-200 characters"}); return }
+		key:=strings.ToLower(text)
+		if seen[key] { c.JSON(http.StatusBadRequest,gin.H{"error":"duplicate option: "+text}); return }
+		seen[key]=true
+		options=append(options,models.PollOption{ID:randomOptionID(),Text:text})
+	}
+	votes, err := h.Store.Votes.CountDocuments(context.Background(),bson.M{"pollId":pollID})
+	if err != nil { c.JSON(http.StatusInternalServerError,gin.H{"error":"failed to inspect poll votes"}); return }
+	if votes>0 {
+		if len(options)!=len(poll.Options) { c.JSON(http.StatusConflict,gin.H{"error":"answer choices are locked after the first vote"}); return }
+		for i:=range options { if options[i].Text!=poll.Options[i].Text { c.JSON(http.StatusConflict,gin.H{"error":"answer choices are locked after the first vote"}); return } }
+		options=poll.Options
+	}
+	for i:=range options { if i<len(poll.Options) { options[i].VoteCount=poll.Options[i].VoteCount; options[i].ID=poll.Options[i].ID } }
+
+	_, err = h.Store.Polls.UpdateOne(context.Background(),bson.M{"_id":pollID,"ownerId":ownerID},
+		bson.M{"$set":bson.M{"question":strings.TrimSpace(req.Question),"options":options}})
+	if err != nil { c.JSON(http.StatusInternalServerError,gin.H{"error":"failed to update poll"}); return }
+	poll.Question=strings.TrimSpace(req.Question); poll.Options=options
+	c.JSON(http.StatusOK,poll)
+}
+
+// DeletePoll — protected + ownership-checked. Removes the durable poll and
+// its vote records, then clears its Redis live state.
+func (h *PollHandler) DeletePoll(c *gin.Context) {
+	pollID, err := primitive.ObjectIDFromHex(c.Param("id"))
+	if err != nil { c.JSON(http.StatusBadRequest,gin.H{"error":"invalid poll id"}); return }
+	ownerID, err := primitive.ObjectIDFromHex(c.GetString(middleware.UserIDKey))
+	if err != nil { c.JSON(http.StatusUnauthorized,gin.H{"error":"invalid user"}); return }
+
+	res, err := h.Store.Polls.DeleteOne(context.Background(),bson.M{"_id":pollID,"ownerId":ownerID})
+	if err != nil { c.JSON(http.StatusInternalServerError,gin.H{"error":"failed to delete poll"}); return }
+	if res.DeletedCount==0 { c.JSON(http.StatusNotFound,gin.H{"error":"poll not found"}); return }
+
+	_, _ = h.Store.Votes.DeleteMany(context.Background(),bson.M{"pollId":pollID})
+	if h.Redis!=nil {
+		for _, optID := range []string{} { _ = optID }
+		h.Redis.Client.Del(context.Background(), "poll:"+pollID.Hex()+":voters")
+		var oldPoll models.Poll
+		_ = oldPoll
+	}
+	c.JSON(http.StatusOK,gin.H{"message":"poll deleted"})
 }
 
 // ClosePoll — protected + ownership-checked server-side. A logged-in user
