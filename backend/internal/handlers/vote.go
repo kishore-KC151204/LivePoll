@@ -134,8 +134,11 @@ func (h *PollHandler) buildResultsEvent(pollID primitive.ObjectID) (models.PollR
 	options := make([]models.PollOption, len(poll.Options))
 	for i, opt := range poll.Options {
 		count, redisErr := h.Redis.Client.Get(ctx, db.VoteCounterKey(pollID.Hex(), opt.ID)).Int64()
-		if redisErr != nil {
-			count = opt.VoteCount // fall back to durable Mongo count
+		if redisErr != nil || count < opt.VoteCount {
+			// Mongo is the durable floor. If Redis was flushed/restarted,
+			// restore the live counter from the durable count before serving it.
+			count = opt.VoteCount
+			_ = h.Redis.Client.Set(ctx, db.VoteCounterKey(pollID.Hex(), opt.ID), count, 0).Err()
 		}
 		options[i] = models.PollOption{ID: opt.ID, Text: opt.Text, VoteCount: count}
 		total += count
