@@ -10,6 +10,7 @@ export default function AppearancePanel({open,onClose}){
 
   useEffect(()=>{
     if(!open)return
+    const previouslyFocused=document.activeElement
     const previousOverflow=document.body.style.overflow
     document.body.style.overflow='hidden'
     const onKey=e=>{if(e.key==='Escape'){e.preventDefault();onClose()}}
@@ -18,6 +19,7 @@ export default function AppearancePanel({open,onClose}){
     return()=>{
       document.body.style.overflow=previousOverflow
       window.removeEventListener('keydown',onKey)
+      if(previouslyFocused instanceof HTMLElement) previouslyFocused.focus()
     }
   },[open,onClose])
 
