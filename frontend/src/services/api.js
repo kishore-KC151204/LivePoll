@@ -25,6 +25,8 @@ export const api = {
   signup: (payload) => request('/auth/signup', { method: 'POST', body: payload }),
   login: (payload) => request('/auth/login', { method: 'POST', body: payload }),
   logout: () => request('/auth/logout', { method: 'POST' }),
+  forgotPassword: (email) => request('/auth/forgot-password', { method: 'POST', body: { email } }),
+  resetPassword: (token, password) => request('/auth/reset-password', { method: 'POST', body: { token, password } }),
 
   createPoll: (payload) => request('/polls', { method: 'POST', body: payload, auth: true }),
   listMyPolls: () => request('/polls', { auth: true }),
