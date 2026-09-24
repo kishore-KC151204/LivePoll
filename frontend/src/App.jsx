@@ -8,6 +8,7 @@ import CreatePoll from './pages/CreatePoll'
 import PollVote from './pages/PollVote'
 import PollResults from './pages/PollResults'
 import ForgotPassword from './pages/ForgotPassword'
+import ResetPassword from './pages/ResetPassword'
 import { useAuth } from './context/AuthContext'
 
 function Nav() {
@@ -50,6 +51,7 @@ export default function App() {
         <Route path="/signup" element={<Signup />} />
         <Route path="/login" element={<Login />} />
         <Route path="/forgot-password" element={<ForgotPassword />} />
+        <Route path="/reset-password" element={<ResetPassword />} />
         <Route path="/dashboard" element={<Dashboard />} />
         <Route path="/create" element={<CreatePoll />} />
         <Route path="/poll/:id" element={<PollVote />} />
