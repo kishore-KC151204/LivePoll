@@ -196,10 +196,7 @@ func (h *PollHandler) DeletePoll(c *gin.Context) {
 
 	_, _ = h.Store.Votes.DeleteMany(context.Background(),bson.M{"pollId":pollID})
 	if h.Redis!=nil {
-		for _, optID := range []string{} { _ = optID }
-		h.Redis.Client.Del(context.Background(), "poll:"+pollID.Hex()+":voters")
-		var oldPoll models.Poll
-		_ = oldPoll
+		_ = h.Redis.Client.Del(context.Background(), db.VotedSetKey(pollID.Hex())).Err()
 	}
 	c.JSON(http.StatusOK,gin.H{"message":"poll deleted"})
 }
