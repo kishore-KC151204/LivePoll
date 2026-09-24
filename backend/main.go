@@ -55,6 +55,8 @@ func main() {
 
 		polls := api.Group("/polls")
 		polls.POST("", middleware.RequireAuth(cfg.JWTSecret), pollHandler.CreatePoll)
+		polls.PATCH("/:id", middleware.RequireAuth(cfg.JWTSecret), pollHandler.UpdatePoll)
+		polls.DELETE("/:id", middleware.RequireAuth(cfg.JWTSecret), pollHandler.DeletePoll)
 		polls.GET("", middleware.RequireAuth(cfg.JWTSecret), pollHandler.ListMyPolls)
 		polls.GET("/:id", pollHandler.GetPoll)                 // public: audience needs this
 		polls.GET("/:id/results", pollHandler.GetResults)      // public snapshot
