@@ -269,3 +269,29 @@ textarea.input { min-height:110px; resize:vertical; }
 :root[data-theme="light"] body::before { opacity:.08; }
 :root[data-theme="light"] .nav { color:var(--text); }
 :root[data-theme="light"] .brand { color:var(--text); }
+
+.accent-name { color:var(--muted); font-size:.78rem; padding-top:2px; }
+.accent-name strong { color:var(--accent); }
+
+.stat {
+  border-color:color-mix(in srgb,var(--accent) 22%,var(--line));
+  box-shadow:inset 0 1px 0 var(--accent-soft),0 16px 45px rgba(0,0,0,.10);
+}
+:root[data-theme="light"] .stat {
+  background:linear-gradient(135deg,var(--accent-soft),rgba(255,255,255,.96) 58%);
+  border-color:color-mix(in srgb,var(--accent) 22%,rgba(20,27,45,.12));
+  box-shadow:inset 0 1px 0 color-mix(in srgb,var(--accent) 24%,transparent),0 12px 30px rgba(31,41,55,.08);
+}
+:root[data-theme="light"] .stat::after {
+  background:linear-gradient(90deg,var(--accent),var(--accent-2));
+}
+:root[data-theme="light"] .feature {
+  background:linear-gradient(135deg,var(--accent-soft),rgba(255,255,255,.92) 62%);
+  border-color:color-mix(in srgb,var(--accent) 16%,rgba(20,27,45,.12));
+}
+:root[data-theme="light"] .btn.primary {
+  background:linear-gradient(135deg,var(--accent),var(--accent-2));
+}
+:root[data-theme="light"] .brand-mark {
+  background:linear-gradient(135deg,var(--accent),var(--accent-2));
+}
