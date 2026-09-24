@@ -87,7 +87,9 @@ Open http://localhost:5173.
 | `MONGODB_DB`   | Database name                              |
 | `REDIS_URL`    | Redis connection string                    |
 | `JWT_SECRET`   | Signing key for auth tokens — required, never commit a real value |
-| `FRONTEND_URL` | Used for CORS allow-list                   |
+| `FRONTEND_URL` | Used for CORS + WebSocket origin allow-list |
+| `RESEND_API_KEY` | Optional key for password-reset emails |
+| `EMAIL_FROM` | Verified sender used for password-reset emails |
 
 **frontend/.env**
 | Variable       | Purpose                          |
@@ -100,6 +102,8 @@ Open http://localhost:5173.
 POST /api/auth/signup            { name, email, password }
 POST /api/auth/login             { email, password } -> { token, user }
 POST /api/auth/logout
+POST /api/auth/forgot-password    { email }
+POST /api/auth/reset-password     { token, password }
 
 POST   /api/polls                (auth) { question, options[] } -> poll
 GET    /api/polls                (auth) -> caller's own polls
